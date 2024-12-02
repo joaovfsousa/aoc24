@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func parse1() ([]int, []int) {
+func parse() ([]int, []int) {
 	list01, list02 := []int{}, []int{}
 
 	file, err := os.Open("days/day01/input01.txt")
@@ -46,7 +46,7 @@ func parse1() ([]int, []int) {
 
 func solve1() int {
 	dist := 0
-	list1, list2 := parse1()
+	list1, list2 := parse()
 
 	slices.Sort(list1)
 	slices.Sort(list2)
@@ -64,8 +64,33 @@ func solve1() int {
 	return dist
 }
 
+func solve2() int {
+	total := 0
+
+	list1, list2 := parse()
+
+	countsList2 := make(map[int]int)
+	existsInList1 := make(map[int]bool)
+
+	for _, v := range list2 {
+		countsList2[v]++
+	}
+
+	for _, v := range list1 {
+		existsInList1[v] = true
+	}
+
+	for k := range existsInList1 {
+		total += k * countsList2[k]
+	}
+
+	return total
+}
+
 func Run() {
 	res1 := solve1()
+	res2 := solve2()
 
 	fmt.Printf("Result 1: %d\n", res1)
+	fmt.Printf("Result 2: %d\n", res2)
 }
