@@ -70,18 +70,19 @@ func solve2() int {
 	list1, list2 := parse()
 
 	countsList2 := make(map[int]int)
-	existsInList1 := make(map[int]bool)
+	visited := make(map[int]bool)
 
 	for _, v := range list2 {
 		countsList2[v]++
 	}
 
-	for _, v := range list1 {
-		existsInList1[v] = true
-	}
+	fmt.Printf("%v\n", countsList2)
 
-	for k := range existsInList1 {
-		total += k * countsList2[k]
+	for _, k := range list1 {
+		if !visited[k] {
+			total += k * countsList2[k]
+			visited[k] = true
+		}
 	}
 
 	return total
