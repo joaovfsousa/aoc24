@@ -4,17 +4,16 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
 	"github.com/joaovfsousa/advent_of_code/core/nums"
 )
 
-func isSafe(line string) bool {
+func isSafe1(parts []string) bool {
 	isIncreasing := false
 	lastNum := 0
-
-	parts := strings.Fields(line)
 
 	for i, p := range parts {
 		num, err := strconv.Atoi(p)
@@ -71,7 +70,9 @@ func solve1() int {
 	for scanner.Scan() {
 		line := scanner.Text()
 
-		if isSafe(line) {
+		parts := strings.Fields(line)
+
+		if isSafe1(parts) {
 			total++
 		}
 	}
@@ -85,6 +86,42 @@ func solve1() int {
 
 func solve2() int {
 	total := 0
+
+	file, err := os.Open("days/day02/input01.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		parts := strings.Fields(line)
+
+		if isSafe1(parts) {
+			total++
+		} else {
+			for i := 0; i < len(parts); i++ {
+				cpParts := make([]string, len(parts))
+
+				copy(cpParts, parts)
+
+				cpParts = slices.Delete(cpParts, i, i+1)
+
+				if isSafe1(cpParts) {
+					total++
+					break
+				}
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		panic(err)
+	}
 
 	return total
 }
