@@ -34,7 +34,7 @@ type Node struct {
 	dir Pos
 }
 
-var dirsToCheck = [8]Pos{
+var solve1DirsToCheck = [8]Pos{
 	// top row
 	{x: -1, y: -1},
 	{x: 0, y: -1},
@@ -48,7 +48,19 @@ var dirsToCheck = [8]Pos{
 	{x: 1, y: 1},
 }
 
-func solve1() int {
+var solve2DirsToCheck = [][2]Pos{
+	// top row
+	{
+		{x: -1, y: -1},
+		{x: 1, y: 1},
+	},
+	{
+		{x: 1, y: -1},
+		{x: -1, y: 1},
+	},
+}
+
+func solve1() (int, [][]byte) {
 	total := 0
 
 	file, err := os.Open("days/day04/input01.txt")
@@ -82,7 +94,7 @@ func solve1() int {
 			if char == 'X' {
 				mNodes := []Node{}
 
-				for _, d := range dirsToCheck {
+				for _, d := range solve1DirsToCheck {
 					neighbor := currentPos.Add(d)
 					if neighbor.isWithinBounds(base) && m[neighbor.y][neighbor.x] == 'M' {
 						mNodes = append(mNodes, Node{
@@ -121,35 +133,48 @@ func solve1() int {
 		panic(err)
 	}
 
-	return total
+	return total, m
 }
 
-func solve2() int {
+func solve2(m [][]byte) int {
 	total := 0
 
-	file, err := os.Open("days/day04/input01.txt")
-	if err != nil {
-		panic(err)
-	}
+	lCount := len(m)
+	cCount := len(m[0])
 
-	defer file.Close()
+	for l := 1; l < lCount-1; l++ {
+		for c := 1; c < cCount-1; c++ {
+			currentPos := Pos{x: c, y: l}
 
-	scanner := bufio.NewScanner(file)
+			char := m[l][c]
 
-	for scanner.Scan() {
-		_ = scanner.Text()
-	}
+			if char == 'A' {
+				isX := true
+				for _, ds := range solve2DirsToCheck {
+					pos1 := currentPos.Add(ds[0])
+					pos2 := currentPos.Add(ds[1])
 
-	if err := scanner.Err(); err != nil {
-		panic(err)
+					b1 := m[pos1.y][pos1.x]
+					b2 := m[pos2.y][pos2.x]
+
+					if !((b1 == 'M' && b2 == 'S') || (b1 == 'S' && b2 == 'M')) {
+						isX = false
+					}
+				}
+
+				if isX {
+					total++
+				}
+			}
+		}
 	}
 
 	return total
 }
 
 func Run() {
-	res1 := solve1()
-	res2 := solve2()
+	res1, m := solve1()
+	res2 := solve2(m)
 
 	fmt.Printf("Result 1: %d\n", res1)
 	fmt.Printf("Result 2: %d\n", res2)
